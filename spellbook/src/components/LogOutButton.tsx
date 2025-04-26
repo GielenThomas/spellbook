@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { Button } from "react-native";
 import { signOut } from "firebase/auth";
-import { auth } from "../../App";
-import { AuthContext } from "../contexts/AuthContext";
+import { auth } from "../../App.tsx";
+import { AuthContext } from "../contexts/AuthContext.tsx";
 
 const LogoutButton = () => {
   const { setUser } = useContext(AuthContext);

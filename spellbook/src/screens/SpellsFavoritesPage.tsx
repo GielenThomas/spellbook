@@ -1,16 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
+import { SpellOverview } from "../components/SpellOverview.tsx";
 export const SpellsFavoritesPage = () => {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "white",
-      }}
-    >
-      <Text style={{ color: "black" }}>Spells Favorites</Text>
-    </View>
-  );
+  return <SpellOverview />;
 };
