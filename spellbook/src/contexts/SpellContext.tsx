@@ -1,24 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
-
-export interface Spell {
-  name: string;
-  level: number;
-  school: string;
-  castingTime: string;
-  range: string;
-  components: {
-    verbal: boolean;
-    somatic: boolean;
-    material: boolean;
-    materialDescription?: string;
-  };
-  duration: string;
-  description: string;
-  higherLevels?: string;
-  classes: string[];
-  ritual?: boolean;
-  concentration?: boolean;
-}
+import { Spell } from "../../utils/spellType.ts";
+import { getSpells } from "../../utils/getSpells.ts";
 
 interface SpellContextType {
   spells: Spell[];
@@ -32,8 +14,9 @@ export const SpellProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [spells, setSpells] = useState<Spell[]>([]);
 
-  const setOfficialSpells = (newSpells: Spell[]) => {
-    setSpells(newSpells);
+  const setOfficialSpells = async () => {
+    const fetchedSpells: Spell[] = await getSpells();
+    setSpells(fetchedSpells);
   };
 
   return (
