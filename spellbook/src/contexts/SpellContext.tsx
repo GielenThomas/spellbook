@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { Spell } from "../../utils/spellType.ts";
 import { getSpells } from "../../utils/getSpells.ts";
+import { sortSpells } from "../../utils/sortSpells.ts";
 
 interface SpellContextType {
   spells: Spell[];
@@ -16,7 +17,7 @@ export const SpellProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setOfficialSpells = async () => {
     const fetchedSpells: Spell[] = await getSpells();
-    setSpells(fetchedSpells);
+    setSpells(sortSpells(fetchedSpells));
   };
 
   return (
