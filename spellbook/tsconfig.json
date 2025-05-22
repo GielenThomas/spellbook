@@ -4,8 +4,9 @@
     "strict": true,
     "moduleResolution": "node16",
     "module": "Node16",
-    "esModuleInterop": true,   
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true
   }
 }
