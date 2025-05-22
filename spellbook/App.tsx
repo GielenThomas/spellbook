@@ -7,6 +7,8 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { AuthProvider } from "./src/contexts/AuthContext.tsx";
 import RootNavigator from "./src/navigation/RootNavigator.tsx";
+import { Provider } from "react-redux";
+import { store } from "./store/store.ts";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCUGEbWLD-6AgD-HD9mfTPaY7fvHp3qhGk",
@@ -23,14 +25,16 @@ export const auth = getAuth(app);
 
 export default function App() {
   return (
-    <AuthProvider>
-      <SpellProvider>
-        <NavigationContainer>
-          <RootNavigator />
-          <StatusBar style="auto" />
-        </NavigationContainer>
-      </SpellProvider>
-    </AuthProvider>
+    <Provider store={store}>
+      <AuthProvider>
+        <SpellProvider>
+          <NavigationContainer>
+            <RootNavigator />
+            <StatusBar style="auto" />
+          </NavigationContainer>
+        </SpellProvider>
+      </AuthProvider>
+    </Provider>
   );
 }
 

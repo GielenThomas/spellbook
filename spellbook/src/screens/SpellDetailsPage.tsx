@@ -1,23 +1,24 @@
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { SpellsOverviewStackParamList } from "../navigation/SpellOverviewStackNavigator.tsx";
-import { SpellsFavoritesStackParamList } from "../navigation/SpellsFavoritesStackNavigator.tsx";
-
-type SpellDetailRouteProp =
-  | StackNavigationProp<SpellsOverviewStackParamList, "SpellDetail">
-  | StackNavigationProp<SpellsFavoritesStackParamList, "SpellDetail">;
+import { StackNavProps } from "../navigation/types.ts";
+import { Button } from "react-native-elements";
+import * as Speech from "expo-speech";
 
 export const SpellDetailsPage = () => {
-  const route = useRoute<SpellDetailRouteProp>();
-  const { spell } = route.params;
+  const {
+    params: { spell },
+  } = useRoute<StackNavProps<"SpellDetails">["route"]>();
+
+  if (!spell) {
+    return <Text>Spell not found</Text>;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.name}>{spell.name}</Text>
       <Text style={styles.detail}>
-        Level {spell.level} {spell.school}
+        {spell.level} {spell.school}
       </Text>
 
       <View style={styles.section}>
@@ -44,16 +45,43 @@ export const SpellDetailsPage = () => {
         <Text style={styles.label}>Description:</Text>
         <Text>{spell.description}</Text>
       </View>
-
+      <View style={styles.section}>
+        <Button
+          title="Read Description"
+          onPress={async () => {
+            Speech.speak(spell.description, {
+              language: "en-US",
+              pitch: 1.0,
+              rate: 0.95,
+            });
+          }}
+        />
+      </View>
       {spell.higherLevels ? (
-        <View style={styles.section}>
-          <Text style={styles.label}>At Higher Levels:</Text>
-          <Text>{spell.higherLevels}</Text>
-        </View>
+        <>
+          <View style={styles.section}>
+            <Text style={styles.label}>At Higher Levels:</Text>
+            <Text>{spell.higherLevels}</Text>
+          </View>
+          <View style={styles.section}>
+            <Button
+              title="Read Higher Levels"
+              onPress={async () => {
+                Speech.speak(spell.higherLevels, {
+                  language: "en-US",
+                  pitch: 1.0,
+                  rate: 0.95,
+                });
+              }}
+            />
+          </View>
+        </>
       ) : null}
     </ScrollView>
   );
 };
+
+export default SpellDetailsPage;
 
 const styles = StyleSheet.create({
   container: {

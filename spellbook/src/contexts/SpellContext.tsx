@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useState } from "react";
 import { Spell } from "../../utils/spellType.ts";
-import { getSpells } from "../../utils/getSpells.ts";
+import { getSpells as fetchSpells } from "../../utils/getSpells.ts";
 import { sortSpells } from "../../utils/sortSpells.ts";
 
 interface SpellContextType {
-  spells: Spell[];
-  setOfficialSpells: (spells: Spell[]) => void;
+  getSpells: () => Promise<Spell[]>;
 }
 
 const SpellContext = createContext<SpellContextType | undefined>(undefined);
@@ -15,13 +14,17 @@ export const SpellProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [spells, setSpells] = useState<Spell[]>([]);
 
-  const setOfficialSpells = async () => {
-    const fetchedSpells: Spell[] = await getSpells();
-    setSpells(sortSpells(fetchedSpells));
+  const getSpells = async () => {
+    const fetchedSpells: Spell[] = await fetchSpells();
+    const sortedSpells = sortSpells(fetchedSpells);
+    setSpells(sortedSpells);
+    console.log("Fetched and sorted spells:", sortedSpells);
+
+    return sortedSpells;
   };
 
   return (
-    <SpellContext.Provider value={{ spells, setOfficialSpells }}>
+    <SpellContext.Provider value={{ getSpells }}>
       {children}
     </SpellContext.Provider>
   );

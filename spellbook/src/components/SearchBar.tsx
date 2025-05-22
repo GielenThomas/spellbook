@@ -1,13 +1,22 @@
 import { TextInput, View } from "react-native";
 
-export const SearchBar = () => {
+interface SearchBarProps {
+  value: string;
+  onChangeText: (text: string) => void;
+}
+
+export const SearchBar: React.FC<SearchBarProps> = ({
+  value,
+  onChangeText,
+}) => {
   return (
     <View
       style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        width: "100%",
         backgroundColor: "white",
+        alignItems: "center",
+        marginTop: 16,
+        marginBottom: 8,
       }}
     >
       <TextInput
@@ -17,11 +26,12 @@ export const SearchBar = () => {
           borderWidth: 1,
           borderRadius: 5,
           paddingHorizontal: 10,
-          marginBottom: 20,
           width: "90%",
         }}
         placeholder="Search spells..."
         placeholderTextColor="gray"
+        value={value}
+        onChangeText={onChangeText}
       />
     </View>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import { View, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { SpellItem } from "./spellItem.tsx";
 import { Spell } from "../../utils/spellType.ts";
@@ -16,21 +16,31 @@ type NavigationProp =
   | StackNavigationProp<SpellsOverviewStackParamList, "SpellsOverviewMain">
   | StackNavigationProp<SpellsFavoritesStackParamList, "SpellsFavoritesMain">;
 
-export const SpellOverviewScreen: React.FC<SpellListProps> = ({ spells }) => {
+export const SpellList: React.FC<SpellListProps> = ({ spells }) => {
   const navigation = useNavigation<NavigationProp>();
   return (
     <View style={styles.container}>
-      <FlatList
-        data={spells}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <SpellItem
-            name={item.name}
-            onPress={navigation.navigate("SpellDetail", { item })}
-          />
-        )}
-        contentContainerStyle={styles.list}
-      />
+      {spells.length === 0 ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      ) : (
+        <FlatList
+          data={spells}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <SpellItem
+              name={item.name}
+              onPress={() =>
+                navigation.navigate("SpellDetail", { spell: item })
+              }
+            />
+          )}
+          contentContainerStyle={styles.list}
+        />
+      )}
     </View>
   );
 };
@@ -38,9 +48,12 @@ export const SpellOverviewScreen: React.FC<SpellListProps> = ({ spells }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#121212",
+    backgroundColor: "white", // Match SpellOverview background
+    // Removed centering to allow stacking under SearchBar
   },
   list: {
     paddingVertical: 16,
+    paddingHorizontal: 12,
+    width: "100%",
   },
 });

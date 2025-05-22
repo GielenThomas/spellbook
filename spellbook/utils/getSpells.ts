@@ -18,7 +18,7 @@ export const getSpells = async () => {
             level: spellData.level || '',
             school: spellData.school || '',
             castingTime: spellData.castingTime || '',
-            spellRange: spellData.range || '',
+            spellRange: spellData.spellRange || '',
             components: spellData.components || '',
             duration: spellData.duration || '',
             description: spellData.description || '',
