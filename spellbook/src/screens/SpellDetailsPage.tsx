@@ -12,6 +12,7 @@ import { Button } from "react-native-elements";
 import * as Speech from "expo-speech";
 import { Ionicons } from "@expo/vector-icons";
 import { useSpells } from "../contexts/SpellContext.tsx";
+import { DeleteSpellButton } from "../components/DeleteSpellButton.tsx";
 
 export const SpellDetailsPage = () => {
   const {
@@ -101,6 +102,8 @@ export const SpellDetailsPage = () => {
           </View>
         </>
       ) : null}
+      {/* Only show delete button for homebrew spells */}
+      {spell.isHomebrew && <DeleteSpellButton spellId={spell.id} />}
     </ScrollView>
   );
 };
