@@ -7,9 +7,10 @@ import { sortSpells } from "../../utils/sortSpells.ts";
 interface SpellContextType {
   spells: Spell[];
   toggleFavorite: (spellId: string) => Promise<void>;
-  getFavoriteSpells: () => Promise<Spell[]>;
   isFavorite: (spellId: string) => boolean;
   favoriteSpells: Spell[];
+  addHomebrewSpell: (spell: Spell) => Promise<void>;
+  deleteHomebrewSpell: (spellId: string) => Promise<void>;
 }
 
 const SpellContext = createContext<SpellContextType | undefined>(undefined);
@@ -29,11 +30,32 @@ export const SpellProvider: React.FC<{ children: React.ReactNode }> = ({
     loadFavorites();
   }, []);
 
+  useEffect(() => {
+    // @ts-ignore
+    AsyncStorage.setItem("favoriteSpellIds", JSON.stringify(favoriteSpellIds));
+  }, [favoriteSpellIds]);
+
+  useEffect(() => {
+    getSpells();
+  }, []);
+
   const getSpells = async () => {
     const fetchedSpells: Spell[] = await fetchSpells();
-    const sortedSpells = sortSpells(fetchedSpells);
+    // Get homebrew spells from AsyncStorage
+    let homebrewSpells: Spell[] = [];
+    try {
+      //@ts-ignore
+      const storedHomebrew = await AsyncStorage.getItem("homebrewSpells");
+      if (storedHomebrew) {
+        homebrewSpells = JSON.parse(storedHomebrew);
+      }
+    } catch (e) {
+      console.error("Failed to load homebrew spells:", e);
+    }
+    const allSpells = [...fetchedSpells, ...homebrewSpells];
+    const sortedSpells = sortSpells(allSpells);
     setSpells(sortedSpells);
-    console.log("Fetched and sorted spells:", sortedSpells);
+    console.log("Fetched, loaded homebrew, and sorted spells:", sortedSpells);
 
     return sortedSpells;
   };
@@ -48,33 +70,45 @@ export const SpellProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  useEffect(() => {
-    // @ts-ignore
-    AsyncStorage.setItem("favoriteSpellIds", JSON.stringify(favoriteSpellIds));
-  }, [favoriteSpellIds]);
-
-  const getFavoriteSpells = async () => {
-    return spells.filter((spell) => favoriteSpellIds.includes(spell.id));
-  };
-
   const isFavorite = (spellId: string) => {
     return favoriteSpellIds.includes(spellId);
   };
 
-  useEffect(() => {
-    getSpells();
-  }, []);
+  const favoriteSpells = spells.filter((spell) =>
+    favoriteSpellIds.includes(spell.id)
+  );
+
+  const addHomebrewSpell = async (spell: Spell) => {
+    const updatedSpells = [...spells, spell];
+    setSpells(updatedSpells);
+    const homebrewSpells = updatedSpells.filter((spell) => spell.isHomebrew);
+    // @ts-ignore
+    await AsyncStorage.setItem(
+      "homebrewSpells",
+      JSON.stringify(homebrewSpells)
+    );
+  };
+
+  const deleteHomebrewSpell = async (spellId: string) => {
+    const updatedSpells = spells.filter((spell) => spell.id !== spellId);
+    setSpells(updatedSpells);
+    const homebrewSpells = updatedSpells.filter((spell) => spell.isHomebrew);
+    //@ts-ignore
+    await AsyncStorage.setItem(
+      "homebrewSpells",
+      JSON.stringify(homebrewSpells)
+    );
+  };
 
   return (
     <SpellContext.Provider
       value={{
         spells,
         toggleFavorite,
-        getFavoriteSpells,
         isFavorite,
-        favoriteSpells: spells.filter((spell) =>
-          favoriteSpellIds.includes(spell.id)
-        ),
+        favoriteSpells,
+        addHomebrewSpell,
+        deleteHomebrewSpell,
       }}
     >
       {children}

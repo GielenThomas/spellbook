@@ -26,4 +26,5 @@ export interface Spell {
   description: string;
   components: ComponentEnum[];
   higherLevels: string;
+  isHomebrew: boolean;
 }

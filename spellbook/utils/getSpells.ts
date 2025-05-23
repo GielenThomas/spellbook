@@ -23,6 +23,7 @@ export const getSpells = async () => {
             duration: spellData.duration || '',
             description: spellData.description || '',
             higherLevels: spellData.higherLevels || '',
+            isHomebrew: false
           });
         });
         console.log("All documents:", data);
