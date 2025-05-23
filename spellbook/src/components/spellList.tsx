@@ -1,5 +1,11 @@
 import React from "react";
-import { View, FlatList, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  Text,
+} from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { SpellItem } from "./spellItem.tsx";
 import { Spell } from "../../utils/spellType.ts";
@@ -18,13 +24,16 @@ type NavigationProp =
 
 export const SpellList: React.FC<SpellListProps> = ({ spells }) => {
   const navigation = useNavigation<NavigationProp>();
+
   return (
     <View style={styles.container}>
       {spells.length === 0 ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <ActivityIndicator size="large" color="#fff" />
+          <Text style={{ color: "#888", fontSize: 16, marginBottom: 12 }}>
+            No spells found
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -32,7 +41,7 @@ export const SpellList: React.FC<SpellListProps> = ({ spells }) => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <SpellItem
-              name={item.name}
+              spell={item}
               onPress={() =>
                 navigation.navigate("SpellDetail", { spell: item })
               }

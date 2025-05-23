@@ -7,20 +7,13 @@ import { Spell } from "../../utils/spellType.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { setSearch } from "../../store/searchSlice.ts";
 
-export const SpellOverview = () => {
-  const [spells, setSpells] = useState<Spell[]>([]);
+interface SpellOverviewProps {
+  spells: Spell[];
+}
+
+export const SpellOverview = ({ spells }: SpellOverviewProps) => {
   const dispatch = useDispatch();
   const search = useSelector((state: any) => state.search.search);
-
-  const { getSpells } = useSpells();
-
-  useEffect(() => {
-    const fetchSpells = async () => {
-      const spellsData = await getSpells();
-      setSpells(spellsData);
-    };
-    fetchSpells();
-  }, []);
 
   const filteredSpells = spells.filter((spell) =>
     spell.name.toLowerCase().includes(search.toLowerCase())

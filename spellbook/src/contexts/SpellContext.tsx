@@ -5,9 +5,11 @@ import { getSpells as fetchSpells } from "../../utils/getSpells.ts";
 import { sortSpells } from "../../utils/sortSpells.ts";
 
 interface SpellContextType {
-  getSpells: () => Promise<Spell[]>;
-  favoriteSpellIds: string[];
+  spells: Spell[];
   toggleFavorite: (spellId: string) => Promise<void>;
+  getFavoriteSpells: () => Promise<Spell[]>;
+  isFavorite: (spellId: string) => boolean;
+  favoriteSpells: Spell[];
 }
 
 const SpellContext = createContext<SpellContextType | undefined>(undefined);
@@ -20,7 +22,7 @@ export const SpellProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const loadFavorites = async () => {
-      //@ts-ignore
+      // @ts-ignore
       const stored = await AsyncStorage.getItem("favoriteSpellIds");
       if (stored) setFavoriteSpellIds(JSON.parse(stored));
     };
@@ -38,21 +40,42 @@ export const SpellProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const toggleFavorite = async (spellId: string) => {
     setFavoriteSpellIds((prev) => {
-      let updated: string[];
       if (prev.includes(spellId)) {
-        updated = prev.filter((id) => id !== spellId);
+        return prev.filter((id) => id !== spellId);
       } else {
-        updated = [...prev, spellId];
+        return [...prev, spellId];
       }
-      //@ts-ignore
-      AsyncStorage.setItem("favoriteSpellIds", JSON.stringify(updated));
-      return updated;
     });
   };
 
+  useEffect(() => {
+    // @ts-ignore
+    AsyncStorage.setItem("favoriteSpellIds", JSON.stringify(favoriteSpellIds));
+  }, [favoriteSpellIds]);
+
+  const getFavoriteSpells = async () => {
+    return spells.filter((spell) => favoriteSpellIds.includes(spell.id));
+  };
+
+  const isFavorite = (spellId: string) => {
+    return favoriteSpellIds.includes(spellId);
+  };
+
+  useEffect(() => {
+    getSpells();
+  }, []);
+
   return (
     <SpellContext.Provider
-      value={{ getSpells, favoriteSpellIds, toggleFavorite }}
+      value={{
+        spells,
+        toggleFavorite,
+        getFavoriteSpells,
+        isFavorite,
+        favoriteSpells: spells.filter((spell) =>
+          favoriteSpellIds.includes(spell.id)
+        ),
+      }}
     >
       {children}
     </SpellContext.Provider>

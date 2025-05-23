@@ -1,6 +1,10 @@
 import React from "react";
-import { Text, View } from "react-native";
 import { SpellOverview } from "../components/SpellOverview.tsx";
+import { useSpells } from "../contexts/SpellContext.tsx";
+import { useEffect, useState } from "react";
+import type { Spell } from "../../utils/spellType.ts";
 export const SpellsOverviewPage = () => {
-  return <SpellOverview />;
+  const { spells } = useSpells();
+
+  return <SpellOverview spells={spells} />;
 };

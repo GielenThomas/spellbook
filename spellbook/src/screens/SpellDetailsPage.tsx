@@ -1,14 +1,24 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { useRoute } from "@react-navigation/native";
 import { StackNavProps } from "../navigation/types.ts";
 import { Button } from "react-native-elements";
 import * as Speech from "expo-speech";
+import { Ionicons } from "@expo/vector-icons";
+import { useSpells } from "../contexts/SpellContext.tsx";
 
 export const SpellDetailsPage = () => {
   const {
     params: { spell },
   } = useRoute<StackNavProps<"SpellDetails">["route"]>();
+
+  const { isFavorite, toggleFavorite } = useSpells();
 
   if (!spell) {
     return <Text>Spell not found</Text>;
@@ -16,7 +26,21 @@ export const SpellDetailsPage = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.name}>{spell.name}</Text>
+      <View
+        style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}
+      >
+        <Text style={styles.name}>{spell.name}</Text>
+        <TouchableOpacity
+          style={{ marginLeft: 12 }}
+          onPress={() => toggleFavorite(spell.id)}
+        >
+          <Ionicons
+            name={isFavorite(spell.id) ? "star" : "star-outline"}
+            size={28}
+            color={isFavorite(spell.id) ? "#ffd700" : "#aaa"}
+          />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.detail}>
         {spell.level} {spell.school}
       </Text>
