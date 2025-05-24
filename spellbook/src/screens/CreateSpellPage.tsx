@@ -1,24 +1,27 @@
 import React from "react";
-import {
-  Text,
-  View,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from "react-native";
+import { Text, View, ScrollView, StyleSheet } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { TextInput, Button } from "react-native";
-import { Picker } from "@react-native-picker/picker";
+import { Button } from "react-native";
+import { randomUUID } from "expo-crypto";
+import { useSpells } from "../contexts/SpellContext.tsx";
+import { showMessage } from "react-native-flash-message";
+
+// Import your custom field components
+import { SpellNameInput } from "../components/createSpell/SpellNameInput.tsx";
+import { SpellLevelPicker } from "../components/createSpell/SpellLevelPicker.tsx";
+import { SpellSchoolPicker } from "../components/createSpell/SpellSchoolPicker.tsx";
+import { SpellSimpleInput } from "../components/createSpell/SpellSimpleInput.tsx";
+import { SpellDescriptionInput } from "../components/createSpell/SpellDescriptionInput.tsx";
+import { SpellComponentsCheckboxGroup } from "../components/createSpell/SpellComponentsCheckboxGroup.tsx";
+import { SpellHigherLevelsInput } from "../components/createSpell/SpellHigherLevelsInput.tsx";
+
 import {
   SpellLevelEnum,
   SchoolEnum,
   ComponentEnum,
   Spell,
 } from "../../utils/spellType.ts";
-import { CheckBox } from "react-native-elements";
-import { v4 as uuidv4 } from "uuid";
 
 const SpellSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
@@ -48,231 +51,162 @@ type FormValues = {
 };
 
 export const CreateSpellPage = () => {
+  const { addHomebrewSpell } = useSpells();
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#f4f4f4" }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
     >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.card}>
-          <Text style={styles.header}>Create New Spell</Text>
-          <Formik<FormValues>
-            initialValues={{
-              name: "",
-              description: "",
-              level: "",
-              school: "",
-              castingTime: "",
-              spellRange: "",
-              duration: "",
-              components: [],
-              higherLevels: "",
-            }}
-            validationSchema={SpellSchema}
-            onSubmit={(values, { resetForm, setSubmitting }) => {
-              const newSpell: Spell = {
-                id: uuidv4(),
-                name: values.name,
-                level: values.level as SpellLevelEnum,
-                school: values.school as SchoolEnum,
-                castingTime: values.castingTime,
-                spellRange: values.spellRange,
-                duration: values.duration,
-                description: values.description,
-                components: values.components as ComponentEnum[],
-                higherLevels: values.higherLevels || "",
-                isHomebrew: true,
-              };
-              console.log(values);
-              resetForm();
-              setSubmitting(false);
-            }}
-          >
-            {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              values,
-              errors,
-              touched,
-              setFieldValue,
-              isSubmitting,
-            }) => (
-              <View style={styles.form}>
-                <Text style={styles.label}>Name</Text>
-                <TextInput
-                  placeholder="Name"
-                  style={styles.input}
-                  onChangeText={handleChange("name")}
-                  onBlur={handleBlur("name")}
-                  value={values.name}
-                  placeholderTextColor="#888"
-                  accessibilityLabel="Spell Name"
-                  autoCapitalize="words"
-                />
-                {touched.name && errors.name && (
-                  <Text style={styles.errorText}>{errors.name}</Text>
-                )}
+      <View style={styles.card}>
+        <Text style={styles.header}>Create New Spell</Text>
+        <Formik<FormValues>
+          initialValues={{
+            name: "",
+            description: "",
+            level: "",
+            school: "",
+            castingTime: "",
+            spellRange: "",
+            duration: "",
+            components: [],
+            higherLevels: "",
+          }}
+          validationSchema={SpellSchema}
+          onSubmit={(values, { resetForm, setSubmitting }) => {
+            const newSpell: Spell = {
+              id: randomUUID(),
+              name: values.name,
+              level: values.level as SpellLevelEnum,
+              school: values.school as SchoolEnum,
+              castingTime: values.castingTime,
+              spellRange: values.spellRange,
+              duration: values.duration,
+              description: values.description,
+              components: values.components as ComponentEnum[],
+              higherLevels: values.higherLevels || "",
+              isHomebrew: true,
+            };
+            addHomebrewSpell(newSpell);
+            showMessage({
+              message: "Spell created!",
+              type: "success",
+              duration: 2000,
+              icon: "success",
+            });
+            resetForm();
+            setSubmitting(false);
+          }}
+        >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+            setFieldValue,
+            isSubmitting,
+          }) => (
+            <View style={styles.form}>
+              <SpellNameInput
+                value={values.name}
+                onChangeText={handleChange("name")}
+                onBlur={handleBlur("name")}
+                error={errors.name}
+                touched={touched.name}
+                styles={styles}
+              />
 
-                <Text style={styles.label}>Level</Text>
-                <View style={styles.pickerWrapper}>
-                  <Picker
-                    selectedValue={values.level}
-                    onValueChange={(itemValue) =>
-                      setFieldValue("level", itemValue)
-                    }
-                    style={styles.picker}
-                    accessibilityLabel="Spell Level"
-                  >
-                    <Picker.Item label="Select Level..." value="" />
-                    {Object.entries(SpellLevelEnum).map(([key, value]) => (
-                      <Picker.Item key={key} label={value} value={value} />
-                    ))}
-                  </Picker>
-                </View>
-                {touched.level && errors.level && (
-                  <Text style={styles.errorText}>{errors.level}</Text>
-                )}
+              <SpellLevelPicker
+                value={values.level}
+                onValueChange={(itemValue) => setFieldValue("level", itemValue)}
+                error={errors.level}
+                touched={touched.level}
+                styles={styles}
+              />
 
-                <Text style={styles.label}>School</Text>
-                <View style={styles.pickerWrapper}>
-                  <Picker
-                    selectedValue={values.school}
-                    onValueChange={(itemValue) =>
-                      setFieldValue("school", itemValue)
-                    }
-                    style={styles.picker}
-                    accessibilityLabel="Spell School"
-                  >
-                    <Picker.Item label="Select School..." value="" />
-                    {Object.entries(SchoolEnum).map(([key, value]) => (
-                      <Picker.Item key={key} label={value} value={value} />
-                    ))}
-                  </Picker>
-                </View>
-                {touched.school && errors.school && (
-                  <Text style={styles.errorText}>{errors.school}</Text>
-                )}
+              <SpellSchoolPicker
+                value={values.school}
+                onValueChange={(itemValue) =>
+                  setFieldValue("school", itemValue)
+                }
+                error={errors.school}
+                touched={touched.school}
+                styles={styles}
+              />
 
-                <Text style={styles.label}>Casting Time</Text>
-                <TextInput
-                  placeholder="Casting Time"
-                  style={styles.input}
-                  onChangeText={handleChange("castingTime")}
-                  onBlur={handleBlur("castingTime")}
-                  value={values.castingTime}
-                  placeholderTextColor="#888"
-                  accessibilityLabel="Casting Time"
-                />
-                {touched.castingTime && errors.castingTime && (
-                  <Text style={styles.errorText}>{errors.castingTime}</Text>
-                )}
+              <SpellSimpleInput
+                label="Casting Time"
+                placeholder="Casting Time"
+                value={values.castingTime}
+                onChangeText={handleChange("castingTime")}
+                onBlur={handleBlur("castingTime")}
+                error={errors.castingTime}
+                touched={touched.castingTime}
+                styles={styles}
+                accessibilityLabel="Casting Time"
+              />
 
-                <Text style={styles.label}>Range</Text>
-                <TextInput
-                  placeholder="Range"
-                  style={styles.input}
-                  onChangeText={handleChange("spellRange")}
-                  onBlur={handleBlur("spellRange")}
-                  value={values.spellRange}
-                  placeholderTextColor="#888"
-                  accessibilityLabel="Spell Range"
-                />
-                {touched.spellRange && errors.spellRange && (
-                  <Text style={styles.errorText}>{errors.spellRange}</Text>
-                )}
+              <SpellSimpleInput
+                label="Range"
+                placeholder="Range"
+                value={values.spellRange}
+                onChangeText={handleChange("spellRange")}
+                onBlur={handleBlur("spellRange")}
+                error={errors.spellRange}
+                touched={touched.spellRange}
+                styles={styles}
+                accessibilityLabel="Spell Range"
+              />
 
-                <Text style={styles.label}>Duration</Text>
-                <TextInput
-                  placeholder="Duration"
-                  style={styles.input}
-                  onChangeText={handleChange("duration")}
-                  onBlur={handleBlur("duration")}
-                  value={values.duration}
-                  placeholderTextColor="#888"
-                  accessibilityLabel="Spell Duration"
-                />
-                {touched.duration && errors.duration && (
-                  <Text style={styles.errorText}>{errors.duration}</Text>
-                )}
+              <SpellSimpleInput
+                label="Duration"
+                placeholder="Duration"
+                value={values.duration}
+                onChangeText={handleChange("duration")}
+                onBlur={handleBlur("duration")}
+                error={errors.duration}
+                touched={touched.duration}
+                styles={styles}
+                accessibilityLabel="Spell Duration"
+              />
 
-                <Text style={styles.label}>Description</Text>
-                <TextInput
-                  placeholder="Description"
-                  style={[styles.input, styles.textArea]}
-                  multiline
-                  numberOfLines={4}
-                  onChangeText={handleChange("description")}
-                  onBlur={handleBlur("description")}
-                  value={values.description}
-                  placeholderTextColor="#888"
-                  accessibilityLabel="Spell Description"
-                />
-                {touched.description && errors.description && (
-                  <Text style={styles.errorText}>{errors.description}</Text>
-                )}
+              <SpellDescriptionInput
+                value={values.description}
+                onChangeText={handleChange("description")}
+                onBlur={handleBlur("description")}
+                error={errors.description}
+                touched={touched.description}
+                styles={styles}
+              />
 
-                <Text style={styles.label}>Components</Text>
-                <View style={styles.checkboxGroup}>
-                  {Object.entries(ComponentEnum).map(([key, value]) => (
-                    <CheckBox
-                      key={key}
-                      title={value}
-                      checked={values.components.includes(value)}
-                      onPress={() => {
-                        if (values.components.includes(value)) {
-                          setFieldValue(
-                            "components",
-                            values.components.filter((v: string) => v !== value)
-                          );
-                        } else {
-                          setFieldValue("components", [
-                            ...values.components,
-                            value,
-                          ]);
-                        }
-                      }}
-                      containerStyle={styles.checkboxContainer}
-                      textStyle={styles.checkboxText}
-                      accessibilityLabel={`Component ${value}`}
-                    />
-                  ))}
-                </View>
-                {touched.components && errors.components && (
-                  <Text style={styles.errorText}>
-                    {errors.components as string}
-                  </Text>
-                )}
+              <SpellComponentsCheckboxGroup
+                values={values.components}
+                setFieldValue={setFieldValue}
+                error={errors.components as string}
+                touched={touched.components}
+                styles={styles}
+              />
 
-                <Text style={styles.label}>At Higher Levels (optional)</Text>
-                <TextInput
-                  placeholder="At Higher Levels (optional)"
-                  style={[styles.input, styles.textAreaSmall]}
-                  multiline
-                  numberOfLines={2}
-                  onChangeText={handleChange("higherLevels")}
-                  onBlur={handleBlur("higherLevels")}
-                  value={values.higherLevels}
-                  placeholderTextColor="#888"
-                  accessibilityLabel="At Higher Levels"
-                />
+              <SpellHigherLevelsInput
+                value={values.higherLevels ?? ""}
+                onChangeText={handleChange("higherLevels")}
+                onBlur={handleBlur("higherLevels")}
+                styles={styles}
+              />
 
-                <Button
-                  title="Create Spell"
-                  onPress={handleSubmit as any}
-                  disabled={isSubmitting}
-                  accessibilityLabel="Create Spell Button"
-                  color="#4B7BE5"
-                />
-              </View>
-            )}
-          </Formik>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+              <Button
+                title="Create Spell"
+                onPress={handleSubmit as any}
+                disabled={isSubmitting}
+                accessibilityLabel="Create Spell Button"
+                color="#4B7BE5"
+              />
+            </View>
+          )}
+        </Formik>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -338,8 +272,8 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     paddingHorizontal: 8,
     fontSize: 16,
-    height: 52, // Match wrapper height
-    textAlignVertical: "center", // Center text vertically (Android only)
+    height: 52,
+    textAlignVertical: "center",
   },
   textArea: {
     minHeight: 70,

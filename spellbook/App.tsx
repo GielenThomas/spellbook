@@ -1,7 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import { SpellsTabNavigator } from "./src/navigation/SpellsTabNavigator.tsx";
 import { SpellProvider } from "./src/contexts/SpellContext.tsx";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
@@ -9,6 +8,7 @@ import { AuthProvider } from "./src/contexts/AuthContext.tsx";
 import RootNavigator from "./src/navigation/RootNavigator.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
+const FlashMessage = require("react-native-flash-message").default;
 
 const firebaseConfig = {
   apiKey: "AIzaSyCUGEbWLD-6AgD-HD9mfTPaY7fvHp3qhGk",
@@ -31,6 +31,7 @@ export default function App() {
           <NavigationContainer>
             <RootNavigator />
             <StatusBar style="auto" />
+            <FlashMessage position="bottom" />
           </NavigationContainer>
         </SpellProvider>
       </AuthProvider>
