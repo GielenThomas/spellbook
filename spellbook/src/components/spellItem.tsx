@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#ffffff",
     fontWeight: "600",
+    fontFamily: "MedievalSharp",
   },
   favoriteButton: {
     marginLeft: 12,

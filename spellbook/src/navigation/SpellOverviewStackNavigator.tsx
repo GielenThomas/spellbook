@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { SpellsOverviewPage } from "../screens/SpellsOverviewPage.tsx";
 import { SpellDetailsPage } from "../screens/SpellDetailsPage.tsx";
 import { Spell } from "../../utils/spellType.ts";
+import LogOutButton from "../components/LogOutButton.tsx"; // Add this import
 
 export type SpellsOverviewStackParamList = {
   SpellsOverviewMain: undefined;
@@ -17,7 +18,10 @@ export const SpellsOverviewStackNavigator = () => {
       <Stack.Screen
         name="SpellsOverviewMain"
         component={SpellsOverviewPage}
-        options={{ title: "Spells" }}
+        options={{
+          title: "Spells",
+          headerRight: () => <LogOutButton />, // Add this line
+        }}
       />
       <Stack.Screen
         name="SpellDetail"

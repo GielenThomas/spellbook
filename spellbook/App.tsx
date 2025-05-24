@@ -9,6 +9,8 @@ import RootNavigator from "./src/navigation/RootNavigator.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
 const FlashMessage = require("react-native-flash-message").default;
+import * as Font from "expo-font";
+import React, { useState } from "react";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCUGEbWLD-6AgD-HD9mfTPaY7fvHp3qhGk",
@@ -24,6 +26,20 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 export default function App() {
+  const [fontsLoaded] = Font.useFonts({
+    MedievalSharp: require("./assets/fonts/MedievalSharp.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ fontFamily: "MedievalSharp", fontSize: 32 }}>
+          Loading...
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <Provider store={store}>
       <AuthProvider>

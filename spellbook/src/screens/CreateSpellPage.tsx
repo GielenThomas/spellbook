@@ -7,7 +7,6 @@ import { randomUUID } from "expo-crypto";
 import { useSpells } from "../contexts/SpellContext.tsx";
 import { showMessage } from "react-native-flash-message";
 
-// Import your custom field components
 import { SpellNameInput } from "../components/createSpell/SpellNameInput.tsx";
 import { SpellLevelPicker } from "../components/createSpell/SpellLevelPicker.tsx";
 import { SpellSchoolPicker } from "../components/createSpell/SpellSchoolPicker.tsx";

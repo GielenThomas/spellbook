@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { SpellsFavoritesPage } from "../screens/SpellsFavoritesPage.tsx";
 import { SpellDetailsPage } from "../screens/SpellDetailsPage.tsx";
 import { Spell } from "../../utils/spellType.ts";
+import LogOutButton from "../components/LogOutButton.tsx";
 
 export type SpellsFavoritesStackParamList = {
   SpellsFavoritesMain: undefined;
@@ -17,7 +18,10 @@ export const SpellsFavoritesStackNavigator = () => {
       <Stack.Screen
         name="SpellsFavoritesMain"
         component={SpellsFavoritesPage}
-        options={{ title: "Favorites" }}
+        options={{
+          title: "Favorites",
+          headerRight: () => <LogOutButton />,
+        }}
       />
       <Stack.Screen
         name="SpellDetail"
