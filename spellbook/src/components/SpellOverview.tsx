@@ -1,11 +1,10 @@
 import { View } from "react-native";
 import { SearchBar } from "../components/SearchBar.tsx";
 import { SpellList } from "../components/spellList.tsx";
-import { useSpells } from "../contexts/SpellContext.tsx";
-import { useEffect, useState } from "react";
 import { Spell } from "../../utils/spellType.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { setSearch } from "../../store/searchSlice.ts";
+import { RootState } from "../../store/store.ts";
 
 interface SpellOverviewProps {
   spells: Spell[];
@@ -13,7 +12,7 @@ interface SpellOverviewProps {
 
 export const SpellOverview = ({ spells }: SpellOverviewProps) => {
   const dispatch = useDispatch();
-  const search = useSelector((state: any) => state.search.search);
+  const search: string = useSelector((state: RootState) => state.search.search);
 
   const filteredSpells = spells.filter((spell) =>
     spell.name.toLowerCase().includes(search.toLowerCase())
